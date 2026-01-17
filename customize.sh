@@ -1,6 +1,6 @@
 SKIPUNZIP=1
 
-if [ "$API" != '19' ] || [ "$ARCH" != 'arm' ]; then
+if [[ "$API" != '19' || "$ARCH" != 'arm' ]]; then
   abort '! arm32 kitkat expected'
 fi
 
@@ -24,8 +24,10 @@ while :; do
     fi
 done
 
+ui_print "- Extracting module files"
+
 # https://android.googlesource.com/platform/frameworks/native/+/refs/tags/android-4.4.4_r2.0.1/cmds/installd/commands.c#581
 /system/bin/dexopt --zip 0 "$outputfd" "$ZIPFILE" "$(getprop dalvik.vm.dexopt-flags)" < "$ZIPFILE" || abort '! Failed to dexopt' 
 
-extract "$ZIPFILE" 'module.prop' "$MODPATH"
+unzip -o "${ZIPFILE}" module.prop -d "${MODPATH}" >&2
 set_perm_recursive "$MODPATH" 0 0 0755 0644
